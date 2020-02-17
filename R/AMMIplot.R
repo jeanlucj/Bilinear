@@ -112,8 +112,8 @@ AMMIplot <- function(bilinearObject, plots = "linear", color = c("darkgreen", "d
 		}
 		text(labelx, labely, labels = winner, col = linecol[winner])
 	}
-	points(Escores[, nmPC], nominal[bilinearObject$DF$G == winnerMin], pch=16, cex=0.6, col=2)
-	points(Escores[, nmPC], nominal[bilinearObject$DF$G == winnerMax], pch=16, cex=0.6, col=4)
+	points(Escores[, nmPC], nominal[bilinearObject$DF$G == winnerMin], pch=16, col=2)
+	points(Escores[, nmPC], nominal[bilinearObject$DF$G == winnerMax], pch=16, col=4)
 
 	if("winner" %in% plots){
 		winnerInt <- list()
