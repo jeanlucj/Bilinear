@@ -359,7 +359,7 @@ bilinear <- function(x = NULL, G = NULL, E = NULL, y = NULL, block = NULL, model
 	}
 	names(PCpvalue) <- paste0("PC", 1:length(PCpvalue))
 	names(Tstat) <- paste0("PC", 1:length(Tstat))
-	anovaPC <- data.frame(Df = anovaDf, SS = SS, MS = MS, testStatistic = Tstat, Pvalue = PCpvalue)
+	anovaPC <- data.frame(Df = anovaDf, SS = SS, MS = MS, testStat = Tstat, Pvalue = PCpvalue)
 	if (isUnRep){
 		ANOVA <- rbind(anovafit[c(E, G),], anovaPC)
 	} else if (blockSig) {
@@ -369,16 +369,16 @@ bilinear <- function(x = NULL, G = NULL, E = NULL, y = NULL, block = NULL, model
 	}
 
 	if (blockSig){
-		ANOVA[E, "testStatistic"] <- ANOVA[E, "MS"] / ANOVA[paste0(E, ":", block), "MS"]
-		ANOVA[E, "Pvalue"] <- pf(ANOVA[E, "testStatistic"], df1 = ANOVA[E, "Df"], df2 = ANOVA[paste0(E, ":", block), "MS"], lower.tail = FALSE)
+		ANOVA[E, "testStat"] <- ANOVA[E, "MS"] / ANOVA[paste0(E, ":", block), "MS"]
+		ANOVA[E, "Pvalue"] <- pf(ANOVA[E, "testStat"], df1 = ANOVA[E, "Df"], df2 = ANOVA[paste0(E, ":", block), "MS"], lower.tail = FALSE)
 	}
 
 	if (!is.null(errorMeanSqDfReps)) {
 		rownames(ANOVA)[nrow(ANOVA)] <- paste0("PC", M)
-		ANOVA <- rbind(ANOVA, data.frame(Df = errorMeanSqDfReps[[2]], SS = prod(unlist(errorMeanSqDfReps[1:2])), MS = errorMeanSqDfReps[[1]], testStatistic = NA, Pvalue = NA, row.names = "Residuals"))
+		ANOVA <- rbind(ANOVA, data.frame(Df = errorMeanSqDfReps[[2]], SS = prod(unlist(errorMeanSqDfReps[1:2])), MS = errorMeanSqDfReps[[1]], testStat = NA, Pvalue = NA, row.names = "Residuals"))
 		for (i in c(G, E)) {
-			ANOVA[i, "testStatistic"] <- ANOVA[i, "MS"] / ANOVA["Residuals", "MS"]
-			ANOVA[i, "Pvalue"] <- pf(ANOVA[i, "testStatistic"], df1 = ANOVA[i, "Df"], df2 = ANOVA["Residuals", "MS"], lower.tail = FALSE)
+			ANOVA[i, "testStat"] <- ANOVA[i, "MS"] / ANOVA["Residuals", "MS"]
+			ANOVA[i, "Pvalue"] <- pf(ANOVA[i, "testStat"], df1 = ANOVA[i, "Df"], df2 = ANOVA["Residuals", "MS"], lower.tail = FALSE)
 		}
 	}
 
