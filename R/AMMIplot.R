@@ -67,7 +67,9 @@ AMMIplot <- function(bilinearObject, plots = "linear", color = c("darkgreen", "d
 
 	x <- seq(Erange[1], Erange[2], length.out = 1000)
 	nominalLines <- sweep(x %*% t(Gscores[,nmPC]), 2, Gintercept, "+")
-	winnerPos <- names(Geffect)[apply(nominalLines, 1, which.max)]
+	whichWin <- apply(nominalLines, 1, which.max)
+	winnerPos <- names(Geffect)[whichWin]
+	whichWin <- unique(whichWin)
 	winner <- unique(winnerPos)
 
 	if("linear" %in% plots){
@@ -77,10 +79,12 @@ AMMIplot <- function(bilinearObject, plots = "linear", color = c("darkgreen", "d
 		for (i in 1:length(winner)){
 			labely <- c(labely, Gintercept[winner[i]] + Gscores[winner[i],nmPC] * labelx[i])
 		}
-		labely <- labely + diff(range(nominalLines)) * 0.05
+
+		nominal <- bilinearObject$DF$Y - Eeffect[bilinearObject$DF$E]
+		labely <- labely + diff(range(nominal)) * 0.05
 
 		xlimits <- range(Escores[,nmPC]) * 1.1
-		ylimits <- range(nominalLines - mu) * 1.1 + mu
+		ylimits <- range(nominal - mu) * 1.1 + mu
 
 		linecol <- rep("#000000", I)
 		names(linecol) <- names(Geffect)
@@ -100,14 +104,16 @@ AMMIplot <- function(bilinearObject, plots = "linear", color = c("darkgreen", "d
 
 		# linLineArgs <- list(col = linecol[i], lwd = linewd[i])
 
-		for (i in 1:length(Gintercept)){
-			abline(Gintercept[i], Gscores[i, nmPC], col = linecol[i], lwd = linewd[i])
+		for (i in (1:length(Gintercept))[-whichWin]){
+		  abline(Gintercept[i], Gscores[i, nmPC], col = linecol[i], lwd = linewd[i])
+		}
+		for (i in whichWin){
+		  abline(Gintercept[i], Gscores[i, nmPC], col = linecol[i], lwd = linewd[i])
 		}
 		text(labelx, labely, labels = winner, col = linecol[winner])
 	}
-	nominal <- bilinearObject$DF$Y - Eeffect[bilinearObject$DF$E]
-	points(AMMIfit$scores$Escores[,1], nominal[bilinearObject$DF$G == winnerMin], pch=16, cex=0.6, col=2)
-	points(AMMIfit$scores$Escores[,1], nominal[bilinearObject$DF$G == winnerMax], pch=16, cex=0.6, col=4)
+	points(Escores[, nmPC], nominal[bilinearObject$DF$G == winnerMin], pch=16, cex=0.6, col=2)
+	points(Escores[, nmPC], nominal[bilinearObject$DF$G == winnerMax], pch=16, cex=0.6, col=4)
 
 	if("winner" %in% plots){
 		winnerInt <- list()
