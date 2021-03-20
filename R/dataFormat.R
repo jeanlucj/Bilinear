@@ -90,6 +90,8 @@ for the 'block' effect.\n"
 			DF <- x
 		} else if (is.matrix(x)){
 			if (is.numeric(x) & allNullGEy) {
+				if(is.null(rownames(x))) rownames(x) <- paste0("G", 1:nrow(x))
+				if(is.null(colnames(x))) colnames(x) <- paste0("E", 1:ncol(x))
 				DF <- meltName(x, G = "G", E = "E", vName = "y")
 				return(list(Y = x, DF = DF, isUnRep = TRUE, sigmasq = NULL, repPerG = 1)) #, anyMissCells = anyMissCells))
 			} else if (is.numeric(x) & !allNullGEy){
@@ -140,7 +142,7 @@ for the 'block' effect.\n"
 	} else {
 		if (isRCBD){	
 			fit <- lm(as.formula(paste0(y," ~ ", E, " + ", block , ":", E, " + ", G, " + ", G, ":", E)), data = DF)
-			pvalBlock <- anova(fit)["E:block","Pr(>F)"]
+			pvalBlock <- anova(fit)[paste0(E, ":", block),"Pr(>F)"]
 			blockSig <- TRUE
 			if (length(alpha) > 1){
 				alphaBlock <- alpha[2] 
